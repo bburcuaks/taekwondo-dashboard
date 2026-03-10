@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(cuid())
+  email    String  @unique
+  password String
+  name     String?
+}
+
+model Student {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  birthDate   DateTime?
+  phone       String?
+  parentName  String?
+  parentPhone String?
+  belt        String?
+  monthlyFee  Float?
+  notes       String?
+  active      Boolean  @default(true)
+  groupId     String?
+  group       Group?   @relation(fields: [groupId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  attendances  Attendance[]
+  payments     Payment[]
+  beltHistory  BeltHistory[]
+  examResults  ExamResult[]
+  studentNotes StudentNote[]
+}
+
+model Group {
+  id           String    @id @default(cuid())
+  name         String
+  trainingDay  String?
+  trainingTime String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  students     Student[]
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  date      DateTime
+  status    String   // present, absent, late
+  createdAt DateTime @default(now())
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  month     Int
+  year      Int
+  amount    Float
+  status    String   // paid, unpaid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BeltHistory {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  belt      String
+  date      DateTime
+  createdAt DateTime @default(now())
+}
+
+model Exam {
+  id          String   @id @default(cuid())
+  date        DateTime
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  results     ExamResult[]
+}
+
+model ExamResult {
+  id        String   @id @default(cuid())
+  examId    String
+  exam      Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  passed    Boolean
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudentNote {
+  id        String   @id @default(cuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  date      DateTime @default(now())
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
