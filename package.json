@@ -22,7 +22,7 @@
     "zod": "^4.3.6"
   },
   "prisma": {
-    "schema": "src/prisma/schema.prisma"
+    "schema": "prisma/schema.prisma"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
